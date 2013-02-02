@@ -1,0 +1,50 @@
+﻿<Window x:Class="RinWPFAPP.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+        xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
+        xmlns:v="clr-namespace:RinWPFAPP.Views"
+        xmlns:vm="clr-namespace:RinWPFAPP.ViewModels"
+        Title="MainWindow" Height="350" Width="525">
+    
+    <Window.DataContext>
+        <vm:MainWindowViewModel/>
+    </Window.DataContext>
+    
+    <i:Interaction.Triggers>
+        
+        <!--WindowのContentRenderedイベントのタイミングでViewModelのInitializeメソッドが呼ばれます-->
+        <i:EventTrigger EventName="ContentRendered">
+            <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Initialize"/>
+        </i:EventTrigger>
+
+        <!--Windowが閉じたタイミングでViewModelのDisposeメソッドが呼ばれます-->
+        <i:EventTrigger EventName="Closed">
+            <l:DataContextDisposeAction/>
+        </i:EventTrigger>
+
+        <!--WindowのCloseキャンセル処理に対応する場合は、WindowCloseCancelBehaviorの使用を検討してください-->
+
+    </i:Interaction.Triggers>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="10"></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Border Background="Azure" Grid.Row="0" Grid.Column="1"/>
+        <Border Background="Azure" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"/>
+        <TextBox Name="sourceDirBox" Grid.Row="0" Grid.Column="0" Background="#cccccc" Drop="sourceDirBox_Drop_1" PreviewDragOver="sourceDirBox_PreviewDragOver_1" Text="{Binding SourceDir}" />
+        <TextBox Name="targetDirBox" Grid.Row="0" Grid.Column="2" Background="#cccccc" Drop="targetDirBox_Drop_1" PreviewDragOver="sourceDirBox_PreviewDragOver_1" Text="{Binding TargetDir}"/>
+        <TextBox Name="ResultBox" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Text="{Binding Result}"/>
+        <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Content="実行" Command="{Binding CheckCommand, Mode=OneWay}"/>
+    </Grid>
+</Window>
