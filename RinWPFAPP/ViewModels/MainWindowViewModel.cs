@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
@@ -63,7 +64,7 @@ namespace RinWPFAPP.ViewModels
 
         public void Initialize()
         {
-            
+
         }
 
         #region CheckCommand
@@ -93,20 +94,35 @@ namespace RinWPFAPP.ViewModels
             checkMd5.targetFolderPath = TargetDir;
             checkMd5.check();
             var tempans = new StringBuilder();
+
+            // 左側のリストから差異があるファイルを抽出
+            foreach (var item in checkMd5.sourceMD5List)
+            {
+                tempans.AppendLine(item.Path);
+            }
+            if (tempans.Length > 0) tempans.Insert(0, checkMd5.sourceMD5List.Count + " ファイルに差異があります。\n");
+            Result1 = tempans.ToString();
+            tempans.Clear();
+
+            // 右側のリストから差異があるファイルを抽出
             foreach (var item in checkMd5.targetMD5List)
             {
                 tempans.AppendLine(item.Path);
             }
-            Result = tempans.ToString();
-            if (String.IsNullOrEmpty(Result))
-            {
+            if (tempans.Length > 0) tempans.Insert(0, checkMd5.targetMD5List.Count + " ファイルに差異があります。\n");
+            Result2 = tempans.ToString();
 
-                Result =  "差異はありませんでした。" ;
+            if (String.IsNullOrEmpty(Result1) && String.IsNullOrEmpty(Result2))
+            {
+                Result1 = "右のフォルダ/ファイルと差異はありませんでした。";
+                Result2 = "左のフォルダ/ファイルと差異はありませんでした。";
+            }
+            else
+            {
+                
             }
         }
         #endregion
-
-
 
 
         #region SourceDir変更通知プロパティ
@@ -117,7 +133,7 @@ namespace RinWPFAPP.ViewModels
             get
             { return _SourceDir; }
             set
-            { 
+            {
                 if (_SourceDir == value)
                     return;
                 _SourceDir = value;
@@ -136,7 +152,7 @@ namespace RinWPFAPP.ViewModels
             get
             { return _TargetDir; }
             set
-            { 
+            {
                 if (_TargetDir == value)
                     return;
                 _TargetDir = value;
@@ -147,28 +163,41 @@ namespace RinWPFAPP.ViewModels
         #endregion
 
 
+        #region Result1変更通知プロパティ
+        private string _Result1;
 
-        #region Result変更通知プロパティ
-        private string _Result;
-
-        public string Result
+        public string Result1
         {
             get
-            { return _Result; }
+            { return _Result1; }
             set
-            { 
-                if (_Result == value)
+            {
+                if (_Result1 == value)
                     return;
-                _Result = value;
-                RaisePropertyChanged("Result");
+                _Result1 = value;
+                RaisePropertyChanged("Result1");
             }
         }
         #endregion
 
 
+        #region Result2変更通知プロパティ
+        private string _Result2;
 
+        public string Result2
+        {
+            get
+            { return _Result2; }
+            set
+            {
+                if (_Result2 == value)
+                    return;
+                _Result2 = value;
+                RaisePropertyChanged("Result2");
+            }
+        }
+        #endregion
 
-       
 
     }
 }
