@@ -1,4 +1,4 @@
-﻿<Window x:Class="RinWPFAPP.Views.MainWindow"
+<Window x:Class="RinWPFAPP.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
@@ -27,11 +27,12 @@
         <!--WindowのCloseキャンセル処理に対応する場合は、WindowCloseCancelBehaviorの使用を検討してください-->
 
     </i:Interaction.Triggers>
-    
+
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition></RowDefinition>
-            <RowDefinition Height="10"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
             <RowDefinition></RowDefinition>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
@@ -40,11 +41,17 @@
             <ColumnDefinition Width="10"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Border Background="Azure" Grid.Row="0" Grid.Column="1"/>
+        <Label Background="Azure" Height="Auto" Name="Label1" VerticalAlignment="Top" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">左右の灰色テキストボックスに、フォルダをドラッグ＆ドロップしてください。</Label>
         <Border Background="Azure" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"/>
-        <TextBox Name="sourceDirBox" Grid.Row="0" Grid.Column="0" Background="#cccccc" Drop="sourceDirBox_Drop_1" PreviewDragOver="sourceDirBox_PreviewDragOver_1" Text="{Binding SourceDir}" />
-        <TextBox Name="targetDirBox" Grid.Row="0" Grid.Column="2" Background="#cccccc" Drop="targetDirBox_Drop_1" PreviewDragOver="sourceDirBox_PreviewDragOver_1" Text="{Binding TargetDir}"/>
-        <TextBox Name="ResultBox" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Text="{Binding Result}"/>
-        <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Content="実行" Command="{Binding CheckCommand, Mode=OneWay}"/>
+        <Border Background="Azure" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"/>
+        <Border Background="Azure" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"/>
+        <TextBox Name="sourceDirBox" Grid.Row="1" Background="#dddddd" Drop="sourceDirBox_Drop_1" PreviewDragOver="sourceDirBox_PreviewDragOver_1" Text="{Binding SourceDir}" Margin="12,0,0,0" TextWrapping="Wrap" />
+        <TextBox Name="targetDirBox" Grid.Row="1" Grid.Column="2" Background="#dddddd" Drop="targetDirBox_Drop_1" PreviewDragOver="sourceDirBox_PreviewDragOver_1" Text="{Binding TargetDir}" Margin="0,0,12,0" TextWrapping="Wrap" />
+        <Label Height="Auto" Name="Label2" HorizontalAlignment="Center" Grid.Row="2" Grid.Column="0">↓</Label>
+        <Label Height="Auto" Name="Label3" HorizontalAlignment="Center" Grid.Row="2" Grid.Column="2">↓</Label>
+        <TextBox Name="ResultBox1" Grid.Row="3" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Text="{Binding Result1}" Margin="12,0,0,6" />
+        <Border Background="Azure" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"/>
+        <TextBox Name="ResultBox2" Grid.Row="3" Grid.Column="2" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Text="{Binding Result2}" Margin="0,0,12,6" />
+        <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Content="フォルダ構成＆ハッシュ値比較" Command="{Binding CheckCommand, Mode=OneWay}"/>
     </Grid>
 </Window>
