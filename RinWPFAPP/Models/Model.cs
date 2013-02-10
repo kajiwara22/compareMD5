@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,42 +23,62 @@ namespace RinWPFAPP.Models
 
         public ObservableSynchronizedCollection<FileMd5> check(String targetFolderPath)
         {
-            var subFolders = System.IO.Directory.GetDirectories(
-                targetFolderPath, "*", System.IO.SearchOption.AllDirectories);
-            var ret = new ObservableSynchronizedCollection<FileMd5>();
-            //フォルダ下をチェック
-            var infiles = System.IO.Directory.GetFiles(
-                    targetFolderPath, "*", System.IO.SearchOption.AllDirectories);
+            var fileList = new List<FileMd5>();
+            String rootPath = targetFolderPath;
 
-            foreach (var file in infiles)
+            // ドラッグ＆ドロップされたものがディレクトリの場合
+            if (Directory.Exists(targetFolderPath))
             {
-                ret.Add(MD5Sum(file));
+                //フォルダ下をチェック
+                var infiles = System.IO.Directory.GetFiles(
+                        targetFolderPath, "*", System.IO.SearchOption.AllDirectories);
+
+                foreach (var file in infiles)
+                {
+                    fileList.Add(MD5Sum(file, targetFolderPath));
+                }
+            }
+            // ドラッグ＆ドロップされたものがファイルの場合
+            else
+            {
+                fileList.Add(MD5Sum(targetFolderPath, targetFolderPath));
             }
 
-            //サブフォルダ下をチェック
-            foreach (var folder in subFolders)
-            {
-                var files = System.IO.Directory.GetFiles(
-                    folder, "*", System.IO.SearchOption.AllDirectories);
-
-                foreach (var file in files)
-                {
-                    ret.Add(MD5Sum(file));
-                }
+            // ファイル一覧を、Path名でソートし、ObservableSynchronizedCollection に詰替え
+            SorterByPath sorter = new SorterByPath();
+            fileList.Sort(sorter);
+            var ret = new ObservableSynchronizedCollection<FileMd5>();
+            foreach(var file in fileList){
+                ret.Add(file);
             }
             return ret;
         }
-
-        public FileMd5 MD5Sum(String path)
+        private class SorterByPath : IComparer<FileMd5>
         {
-            FileStream fs = new FileStream(path, FileMode.Open);
-            string md5sum = BitConverter.ToString(MD5.Create().ComputeHash(fs)).ToLower().Replace("-", "");
-            fs.Close();
+            public int Compare(FileMd5 x, FileMd5 y)
+            {
+                return x.Path.CompareTo(y.Path);
+            }
+        }
+
+        public FileMd5 MD5Sum(String path, String rootPath)
+        {
+            if(File.Exists(path)){
+                FileStream fs = new FileStream(path, FileMode.Open);
+                string md5sum = BitConverter.ToString(MD5.Create().ComputeHash(fs)).ToLower().Replace("-", "");
+                fs.Close();
+                return new FileMd5
+                {
+                    MD5 = md5sum,
+                    // 相対パス変換後格納
+                    Path = Directory.Exists(rootPath) ? path.Replace(rootPath+"\\", "") : path.Replace(System.IO.Path.GetDirectoryName(rootPath)+"\\", "")
+                };
+            }
             return new FileMd5
             {
-                MD5 = md5sum,
-                Path = path
-            };
+                MD5 = "",
+                Path = "（フォルダ/ファイルがありません）" + path.Replace(System.IO.Path.GetDirectoryName(rootPath) + "\\", "")
+            }; 
         }
 
         public void check()
@@ -69,19 +89,23 @@ namespace RinWPFAPP.Models
             }
             sourceMD5List = check(this.sourceFolderPath);
             targetMD5List = check(this.targetFolderPath);
-            if(sourceMD5List.Count >= targetMD5List.Count)
-            {
-                var tempTarget = targetMD5List;
-                targetMD5List = sourceMD5List;
-                sourceMD5List = tempTarget;
-            }
+
             foreach (var sourceMD5item in sourceMD5List)
             {
                 foreach (var targetMD5item in targetMD5List)
                 {
-                    if (targetMD5item.MD5 == sourceMD5item.MD5)
+                    int iCompare = sourceMD5item.Path.CompareTo(targetMD5item.Path);
+                    if (iCompare == 0)
                     {
-                        targetMD5List.Remove(targetMD5item);
+                        if (targetMD5item.MD5 == sourceMD5item.MD5)
+                        {
+                            targetMD5List.Remove(targetMD5item);
+                            sourceMD5List.Remove(sourceMD5item);
+                        }
+                        break;
+                    }
+                    else if (iCompare < 0)
+                    {
                         break;
                     }
                 }
