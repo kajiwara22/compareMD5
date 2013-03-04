@@ -64,7 +64,7 @@ namespace RinWPFAPP.Models
         public FileMd5 MD5Sum(String path, String rootPath)
         {
             if(File.Exists(path)){
-                FileStream fs = new FileStream(path, FileMode.Open);
+                FileStream fs = new FileStream(path, FileMode.Open, System.IO.FileAccess.Read);
                 string md5sum = BitConverter.ToString(MD5.Create().ComputeHash(fs)).ToLower().Replace("-", "");
                 fs.Close();
                 return new FileMd5
@@ -108,6 +108,12 @@ namespace RinWPFAPP.Models
                     {
                         break;
                     }
+                    //if (iCompare == 0 && targetMD5item.MD5 == sourceMD5item.MD5)
+                    //{
+                    //    targetMD5List.Remove(targetMD5item);
+                    //    sourceMD5List.Remove(sourceMD5item);
+                    //    break;
+                    //}
                 }
             }
         }
